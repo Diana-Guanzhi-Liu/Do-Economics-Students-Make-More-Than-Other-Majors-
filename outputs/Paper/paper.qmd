@@ -1,11 +1,8 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
-author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: LINK."
-date: today
+title: "Do Economics Majors Make More Than Other Majors?"
+author: Diana Liu
+thanks: "Code and data are available at: https://github.com/Diana-Guanzhi-Liu/Do-Economics-Students-Make-More-Than-Other-Majors-"
+date: 11 February 2024
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
 format: pdf
@@ -17,9 +14,12 @@ bibliography: references.bib
 #| include: false
 #| warning: false
 #| message: false
-
 library(tidyverse)
-library(palmerpenguins)
+library(gt)
+library(shiny)
+library(ggplot2)
+library(scales)
+library(gridExtra)
 ```
 
 
@@ -28,7 +28,7 @@ library(palmerpenguins)
 You can and should cross-reference sections and sub-sections. 
 
 The remainder of this paper is structured as follows. @sec-data....
-
+(@CitePaper)
 
 
 # Data {#sec-data}
@@ -36,17 +36,12 @@ The remainder of this paper is structured as follows. @sec-data....
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+#| label: tbl-constructed data
+#| fig-cap: Sample of Constructed data from Bleemer and Mehta
 #| echo: false
+load("/cloud/project/Inputs/Raw Data/ACS_Data_UCSCEcon_NAICS.Rda")
+gt(head(acs))
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
 ```
 
 Talk more about it.
@@ -54,87 +49,98 @@ Talk more about it.
 And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
 ```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
+#| label: tbl-cleaned data
+#| fig-cap: Sample of Cleaned Data of UCSC Students
 #| echo: false
 #| warning: false
 #| message: false
 
-analysis_data <- read_csv(here::here("outputs/data/analysis_data.csv"))
+load("/cloud/project/outputs/Data/Majors_Income_Cleaned.Rda")
+gt(head(cleaned_majors_data))
 
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
 ```
 
 Talk way more about it. 
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
 
+load("/cloud/project/outputs/Data/Majors_Income_Cleaned.Rda")
 
+#Sort Majors into Categories
+Sciences <- c("Agriculture", "Environment and Natural Resources", "Communication Technologies", "Family and Consumer Sciences", "Library Science", "Biology and Life Sciences", "Mathematics and Statistics", "Physical Sciences", "Medical and Health Sciences and Services")
+Arts <- c("Architecture", "Communications", "Area, Ethnic, and Civilization Studies", "Education Administration and Teaching", "Cosmetology Services and Culinary Arts", "Linguistics and Foreign Languages", "Law", "English Language, Literature, and Composition", "Liberal Arts and Humanities", "Physical Fitness, Parks, Recreation, and Leisure", "Philosophy and Religious Studies", "Theology and Religious Vocations", "Psychology", "Criminal Justice and Fire Protection", "Public Affairs, Policy, and Social Work", "Social Sciences", "Precision Production and Industrial Arts", "Fine Arts", "History")
+Business <- c("Business")
+Applied_Science <- c("Computer and Information Sciences", "Engineering", "Engineering Technologies", "Military Technologies", "Nuclear, Industrial Radiology, and Biological Technologies", "Construction Services", "Electrical and Mechanic Repairs and Technologies", "Transportation Sciences and Technologies")
 
-# Model
+business <- subset(cleaned_majors_data, Label %in% Business)
+sciences <- subset(cleaned_majors_data, Label %in% Sciences)
+arts <- subset(cleaned_majors_data, Label %in% Arts)
+applied_science <- subset(cleaned_majors_data, Label %in% Applied_Science)
 
-The goal of our modelling strategy is twofold. Firstly,...
+```
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
 
 
 # Results
 
 Our results are summarized in @tbl-modelresults.
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("outputs/models/first_model.rds"))
-```
 
 ```{r}
 #| echo: false
 #| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| label: fig-majors income
+#| tbl-cap: Histogram of Business, Arts, Sciences, and Applied Sciences majors wage income
 #| warning: false
 
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
+#summary(business)
+
+business_hist <-
+  business |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Wages of Business Majors", x = "Wage Income")
+
+arts_hist <-
+  arts |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Wages of Arts Majors", x = "Wage Income")
+
+science_hist <-
+  sciences |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Wages of Sciences Majors", x = "Wage Income")
+
+applied_science_hist <-
+  applied_science |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Wages of Applied Science Majors", x = "Wage Income")
+
+grid.arrange(arts_hist, business_hist, ncol=2)
+grid.arrange(science_hist, applied_science_hist, ncol=2)
+  
 ```
 
+```{r}
+
+```
 
 
 
@@ -151,65 +157,6 @@ If my paper were 10 pages, then should be be at least 2.5 pages. The discussion 
 ## Weaknesses and next steps
 
 Weaknesses and next steps should also be included.
-
-\newpage
-
-\appendix
-
-# Appendix {-}
-
-
-# Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
 
 
 

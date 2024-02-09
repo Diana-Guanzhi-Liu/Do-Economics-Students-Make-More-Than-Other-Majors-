@@ -20,6 +20,7 @@ cleaned_majors_data <-
   select(YEAR, DEGFIELD, INCWAGE, INDNAICS)
 Industry$INDNAICS <- as.character(Industry$INDNAICS)
 cleaned_majors_data$DEGFIELD <- as.character(cleaned_majors_data$DEGFIELD)
+cleaned_majors_data$INCWAGE <- as.numeric(cleaned_majors_data$INCWAGE)
 cleaned_majors_data <- as.data.frame(cleaned_majors_data)
 Industry <- as.data.frame(Industry)
 Majors <- as.data.frame(Majors)
