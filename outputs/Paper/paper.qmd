@@ -20,6 +20,8 @@ library(shiny)
 library(ggplot2)
 library(scales)
 library(gridExtra)
+library(psych)
+library(ggpubr)
 ```
 
 
@@ -30,33 +32,27 @@ You can and should cross-reference sections and sub-sections.
 The remainder of this paper is structured as follows. @sec-data....
 (@CitePaper)
 
+Replication DOI: https://doi.org/10.48152/ssrp-m299-mq34
 
 # Data {#sec-data}
 
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
-```{r}
-#| label: tbl-constructed data
-#| fig-cap: Sample of Constructed data from Bleemer and Mehta
-#| echo: false
-load("/cloud/project/Inputs/Raw Data/ACS_Data_UCSCEcon_NAICS.Rda")
-gt(head(acs))
-
-```
 
 Talk more about it.
 
 And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
-```{r}
-#| label: tbl-cleaned data
+@tbl-cleaned-data
+```{r, fig.width = 6, fig.height = 5}
+#| label: tbl-cleaned-data
 #| fig-cap: Sample of Cleaned Data of UCSC Students
 #| echo: false
 #| warning: false
 #| message: false
 
 load("/cloud/project/outputs/Data/Majors_Income_Cleaned.Rda")
-gt(head(cleaned_majors_data))
+cols_width(gt(head(cleaned_majors_data)), everything() ~ pct(15))
 
 ```
 
@@ -85,17 +81,30 @@ applied_science <- subset(cleaned_majors_data, Label %in% Applied_Science)
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
-
+Our results are summarized in (@tbl-majors-income-summary).
 
 ```{r}
 #| echo: false
 #| eval: true
-#| label: fig-majors income
-#| tbl-cap: Histogram of Business, Arts, Sciences, and Applied Sciences majors wage income
+#| label: tbl-majors-income-summary
+#| tbl-cap: Summary Statistics of Business, Arts, Sciences, and Applied Sciences Majors Wage Income
 #| warning: false
 
-#summary(business)
+Business_Majors <- unclass(summary(business$INCWAGE))
+Arts_Majors <- unclass(summary(arts$INCWAGE))
+Science_Majors <- unclass(summary(sciences$INCWAGE))
+Applied_Science_Majors <- unclass(summary(applied_science$INCWAGE))
+summary_majors <- data.frame(Business_Majors, Arts_Majors, Science_Majors, Applied_Science_Majors, check.names = FALSE, stringsAsFactors = FALSE)
+summary_majors
+```
+
+
+```{r, fig.width = 10, fig.height = 5}
+#| echo: false
+#| eval: true
+#| label: fig-majors-income
+#| fig-cap: Histogram of Business, Arts, Sciences, and Applied Sciences majors wage Income
+#| warning: false
 
 business_hist <-
   business |>
@@ -104,7 +113,7 @@ business_hist <-
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
-  labs(title = "Wages of Business Majors", x = "Wage Income")
+  labs(title = "Business Majors", x = "Wage Income")
 
 arts_hist <-
   arts |>
@@ -113,7 +122,7 @@ arts_hist <-
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
-  labs(title = "Wages of Arts Majors", x = "Wage Income")
+  labs(title = "Arts Majors", x = "Wage Income")
 
 science_hist <-
   sciences |>
@@ -122,7 +131,7 @@ science_hist <-
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
-  labs(title = "Wages of Sciences Majors", x = "Wage Income")
+  labs(title = "Sciences Majors", x = "Wage Income")
 
 applied_science_hist <-
   applied_science |>
@@ -131,18 +140,139 @@ applied_science_hist <-
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
-  labs(title = "Wages of Applied Science Majors", x = "Wage Income")
+  labs(title = "Applied Science Majors", x = "Wage Income")
 
-grid.arrange(arts_hist, business_hist, ncol=2)
-grid.arrange(science_hist, applied_science_hist, ncol=2)
+ggarrange(arts_hist, business_hist, science_hist, applied_science_hist, ncol=2, nrow = 2)
   
 ```
 
-```{r}
+```{r, fig.width = 10, fig.height = 5}
+#| echo: false
+#| eval: true
+#| label: fig-majors-industries
+#| fig-cap: Bar Graph of Preferred Industries for Business, Arts, Sciences, and Applied Sciences Majors
+#| warning: false
+
+business_ind <-
+  business |>
+  ggplot(aes(y = Industry)) +
+  geom_bar() +
+  theme_minimal() +
+  xlim(0, 6000) +
+  labs(title = "Business Majors",  x = "Total Students")
+ 
+arts_ind <- 
+  arts |>
+  ggplot(aes(y = Industry)) +
+  geom_bar() +
+  theme_minimal() +
+  xlim(0, 6000) +
+  labs(title = "Arts Majors", x = "Total Students")
+
+sciences_ind <-
+  sciences |>
+  ggplot(aes(y = Industry)) +
+  geom_bar() +
+  theme_minimal() +
+  xlim(0, 6000) +
+  labs(title = "Sciences Majors", x = "Total Students")
+
+applied_science_ind <-
+  applied_science |>
+  ggplot(aes(y = Industry)) +
+  geom_bar() +
+  theme_minimal() +
+  xlim(0, 6000) +
+  labs(title = "Applied Science Majors", x = "Total Students")
+
+ggarrange(arts_ind, business_ind, sciences_ind, applied_science_ind, ncol = 2, nrow = 2)
+```
+
+(@fig-majors-income)
+
+```{r, fig.width = 10, fig.height = 3}
+#| echo: false
+#| eval: true
+#| label: fig1-industries-high-income
+#| labe2: fig1-industries-low-income
+#| fig-cap: Bar Graph of Preferred Industries for Business, Arts, Sciences, and Applied Sciences Majors
+#| warning: false
+
+publ <- subset(cleaned_majors_data, Industry %in% "Public Administration")
+fir <- subset(cleaned_majors_data, Industry %in% "FIRE")
+cons <- subset(cleaned_majors_data, Industry %in% "Construction") 
+whol <- subset(cleaned_majors_data, Industry %in% "Wholesale Trade")
+util <- subset(cleaned_majors_data, Industry %in% "Utilities") 
+
+
+public_admin <-
+  publ |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Public Administration", x = "Wage Income")
+
+fire <-
+  fir |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Finance Insurance Realestate", x = "Wage Income")
+
+construct <-
+  cons|>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Construction", x = "Wage Income")
+
+wholesale_trd <-
+  whol |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Wholesale Trade", x = "Wage Income")
+
+utilities <-
+  util|>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram() +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Utilities", x = "Wage Income")
+
+ggarrange(public_admin, fire, construct, ncol = 3)
+ggarrange(wholesale_trd, utilities, ncol = 2)
 
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-industry-income-summary
+#| tbl-cap: Summary Statistics of Public Administration, FIRE, Construction, Wholesale Trade, and Utilities Wage Income
+#| warning: false
 
+#Summary Statistics
+public_administration_industry <- unclass(summary(publ$INCWAGE))
+fire_industry <- unclass(summary(fir$INCWAGE))
+construction_industry <- unclass(summary(cons$INCWAGE))
+wholesale_trade_industry <- unclass(summary(whol$INCWAGE))
+utilities_industry <- unclass(summary(util$INCWAGE))
+summary_industries <- data.frame(public_administration_industry, fire_industry, construction_industry, wholesale_trade_industry, utilities_industry,  check.names = FALSE, stringsAsFactors = FALSE)
+summary_industries
+```
+
+```
 
 # Discussion
 
