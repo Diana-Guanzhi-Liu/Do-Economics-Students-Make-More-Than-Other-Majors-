@@ -22,6 +22,9 @@ library(scales)
 library(gridExtra)
 library(psych)
 library(ggpubr)
+library(dplyr)
+library(gtsummary)
+library(tinytex)
 ```
 
 
@@ -33,30 +36,43 @@ The remainder of this paper is structured as follows. @sec-data....
 (@CitePaper)
 
 Replication DOI: https://doi.org/10.48152/ssrp-m299-mq34
+(@CiteR)
 
-# Data {#sec-data}
+# Data
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+The authors of the original paper "Will Studying Economics Make You Rich? A Regression 
+Discontinuity Analysis of the Returns to College Major" (@CitePaper) took public student data from the University of California, Santa Cruz (UCSC) registrar for their analysis. This data set contains all newly admitted students between 1999 and 2014, for each student, the original publication observes many variables like race, SAT score, and GPA that this paper will not cover. These additional variables are removed during the data cleaning process leaving remaining variables of YEAR, DEGFIELD, INCWAGE, and INDNAICS. The original paper has already constructed and cleaned the data, additional cleaning of the data set, and further analysis was performed with tidyverse (@CiteTidy), gt (@CiteGt), shiny (@CiteShiny), ggplot2 (@CiteGgplot2), scales (@CiteScales), psych (@CitePsych), dplyr (@CiteDplyr), vtable(@CiteVtable)) and ggpubr (@CiteGgpubr).
 
+Similar data sets from other schools can be used to verify the results produced by UCSC data. Taking student data from schools in different regions of the US or from different countries can make the results more generalization, this will be discussed further in the weaknesses and next steps section.
 
-Talk more about it.
+## YEAR
+The cleaned data set contains student data from 2009 to 2017 with approximately 4000 observations each year except in 2011, 2012, and 2015 where the data is missing. There is a total of 24857 observations of student data that will be included in the analysis.
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
-
-@tbl-cleaned-data
-```{r, fig.width = 6, fig.height = 5}
-#| label: tbl-cleaned-data
-#| fig-cap: Sample of Cleaned Data of UCSC Students
+```{r}
 #| echo: false
 #| warning: false
 #| message: false
-
+#| include: false
 load("/cloud/project/outputs/Data/Majors_Income_Cleaned.Rda")
-cols_width(gt(head(cleaned_majors_data)), everything() ~ pct(15))
 
+count(filter(cleaned_majors_data, YEAR == 2009))
+count(filter(cleaned_majors_data, YEAR == 2010))
+count(filter(cleaned_majors_data, YEAR == 2011))
+count(filter(cleaned_majors_data, YEAR == 2012))
+count(filter(cleaned_majors_data, YEAR == 2013))
+count(filter(cleaned_majors_data, YEAR == 2014))
+count(filter(cleaned_majors_data, YEAR == 2015))
+count(filter(cleaned_majors_data, YEAR == 2016))
+count(filter(cleaned_majors_data, YEAR == 2017))
 ```
 
-Talk way more about it. 
+## DEGFIELD and Label
+DEGFIELD is a 2 digit code that specifies the primary major of study each student is enrolled in. Using a spreadsheet of DEGFIELD codes and its corresponding major provided by IPUMS USA[^1], each code can be matched to the student's major. For example, the code 62 corresponds to the label "Business" seen in the first row of @tbl-cleaned-data. This matching creates a new column called Label, referring to the name of the major the student studies.
+
+The specific majors are placed into 4 categories: Arts, Sciences, Business, and Applied Science. Arts contains fine art and humanities majors like Philosophy and Religious Studies, Social Sciences, and History. Sciences contains majors like Agriculture, Mathematics, and Life Sciences. Applied science contains majors like Engineering. Finally, Business is its own category. There are a total of 10972 observations in Arts, 7693 in Business, 3362 in Applied Science and 2617 in Science (@tbl-count-majors).
+
+[^1]: IPUMS USA collects public census data https://usa.ipums.org/usa-action/variables/DEGFIELD#description_section
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -77,11 +93,70 @@ applied_science <- subset(cleaned_majors_data, Label %in% Applied_Science)
 
 ```
 
+```{r}
+#| label: tbl-count-majors
+#| tbl-cap: Table Containing the Number of Students in Each Category of Majors"
+#| echo: false
+#| warning: false
+#| message: false
 
+count_majors <- data.frame(c(count(arts)), c(count(business)), c(count(applied_science)), c(count(sciences)))
+count_majors <-
+  count_majors |>
+  rename("Arts" = n, "Business" = n.1, "Applied Science" = n.2, "Sciences" = n.3)
+
+tab_caption(gt(count_majors), caption = "Table Containing the Number of Students in Each Category of Majors")
+
+```
+
+## INCWAGE
+INCWAGE refers to the wage income that was reported by the students after graduation in USD. This variable was constructed by @CitePaper from the survey results of biannual UC Undergraduate Experience Survey (UCUES), conducted online in the spring of even-numbered years.
+
+The estimand in @CitePaper as well as this paper is the wage income of former students. Wage income is defined as the income from the individual's primary employment, excluding investments, the sale of property, and additional jobs. Since the wage income is self reported, measurement error is difficult to determine and non response bias could affect the results. The possibility of non response bias from former students who did not respond to the survey being systematically different than those who did is explored further in the weaknesses and next steps section. In later analysis, wage income is truncated to between 0 and 200000 USD to prevent the mean and other calculations from being skewed by outliers.
+
+From summary statistics, the lowest reported wage income was 106 USD and the highest was 690189, with a mean of 50472 and median of 43645 (@tbl-summary-cleaned-data). Median income according to US Census Data from around the same time period is approximately 37000 (@CiteCensus), supporting the claim that individuals who complete an undergraduate degree earn more on average than those who do not. In this paper, the wage income of students in each category is compared to determine which majors earn the most income on average. 
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| label: tbl-summary-cleaned-data
+#| tbl-cap: Summary statistics of Wage Income of All Students
+
+all_students <- unclass(summary(cleaned_majors_data$INCWAGE))
+data_summary <- data.frame(all_students)
+summary_stats <- c("Min", "1st Quartile", "Median", "Mean", "3rd Quartile", "Max")
+summary_all_students <-
+  cols_add(gt(data_summary), summary_stats) |>
+  cols_move_to_start(summary_stats)
+
+summary_all_students
+
+```
+
+## INDNAICS and Industry
+The North American Industry Classification System (NAICS) is a system of numerical codes that correspond to specific industries, INDNAICS takes the first 2 digits of the NAICS code which refers to broader categories of industries(@tbl-cleaned-data). For example, 111110 is the NAICS code for soybean farming, its first two digits 11 is the general industry of agriculture. Each observation in the data set of the code is mapped to its industry name, creating a new Industry column.
+
+Industry was also self reported by former students in the same UCUES survey as wage income. There are 20 general industries, but students only reported Wholesale Trade, Utilities, Rental/Leasing, Public Administration, Manufacturing, Management Firms, Finance Insurance Real Estate (FIRE), and Construction. The analysis will focus on the most popular industries which are Public Administration, FIRE, and Construction as well as two less popular industries of Utilities and Wholesale Trade.
+
+There are two components of industry that are analyzed in this paper. First, the most popular industries for each category of majors are determined, this establishes a relationship between the major an individual studies and the industry they choose to work in. For example, a business student would be more likely to work in FIRE than manufacturing. Then we calculate the median income of each industry to explain that the difference in the wage income of different majors stem from employment in more or less profitable industries. 
+
+```{r, fig.width = 6, fig.height = 5}
+#| label: tbl-cleaned-data
+#| tbl-cap: Sample of Cleaned Data of UCSC Students
+#| echo: false
+#| warning: false
+#| message: false
+
+cols_width(gt(head(cleaned_majors_data)), everything() ~ pct(15))
+```
 
 # Results
 
-Our results are summarized in (@tbl-majors-income-summary).
+## Which Majors Make the Most Money?
+From @tbl-majors-income-summary, science majors have the lowest median income of 38619 USD, followed by arts majors 40125, business majors 46713, and applied science majors earned the most with 57428. The difference between the highest and lowest paying majors is 18809 USD, and the average difference between majors is 6270 USD, this is nearly the difference in income among those who have an undergraduate degree and those who do not of 6645(@CiteCensus). 
+
+This ranking is the same for mean income, with a smaller gap between wage income of different majors. For all four majors, the mean income is higher than the median. This indicates that the distributions are skewed to the right, which is confirmed by (@fig-majors-income).
 
 ```{r}
 #| echo: false
@@ -95,9 +170,15 @@ Arts_Majors <- unclass(summary(arts$INCWAGE))
 Science_Majors <- unclass(summary(sciences$INCWAGE))
 Applied_Science_Majors <- unclass(summary(applied_science$INCWAGE))
 summary_majors <- data.frame(Business_Majors, Arts_Majors, Science_Majors, Applied_Science_Majors, check.names = FALSE, stringsAsFactors = FALSE)
+
+summary_stats <- c("Min", "1st Quartile", "Median", "Mean", "3rd Quartile", "Max")
+summary_majors <-
+  cols_add(gt(summary_majors), summary_stats) |>
+  cols_move_to_start(summary_stats)
+
 summary_majors
 ```
-
+By plotting wage income for all majors on separate histograms, we can see that wage income is normally distributed and skews right (@fig-majors-income). For the histograms, max wage income is truncated to 200000 so that the main distribution curve can be zoomed in on. The bin width is 5000 USD as 40 bins per histogram is a size that is optimal for visualizing the distribution without the graph looking too busy. The Like the summary statistics the median for arts, sciences, and business majors are just under 50000 while for applied science majors it is over 50000 (@fig-majors-income).
 
 ```{r, fig.width = 10, fig.height = 5}
 #| echo: false
@@ -109,7 +190,7 @@ summary_majors
 business_hist <-
   business |>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
@@ -118,7 +199,7 @@ business_hist <-
 arts_hist <-
   arts |>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
@@ -127,7 +208,7 @@ arts_hist <-
 science_hist <-
   sciences |>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
@@ -136,7 +217,7 @@ science_hist <-
 applied_science_hist <-
   applied_science |>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
@@ -145,6 +226,11 @@ applied_science_hist <-
 ggarrange(arts_hist, business_hist, science_hist, applied_science_hist, ncol=2, nrow = 2)
   
 ```
+
+## Which Industries Does Each Major Prefer?
+For each major, student data about the individual's self-reported industry is plotted on a bar graph. Arts majors prefer to go into the public administration industry the most with nearly 5000 students going into the industry, followed by the finance insurance real-estate (FIRE) 4000, and construction 2000. Business majors unsurprisingly prefer FIRE with over 5000 students choosing it. Construction, public administration and management firms are far less popular, with under 1000 in each. Science majors prefer public administration, FIRE, and construction almost equally with approximately 1000 students in each industry. Lastly, applied science majors prefer construction with 2000 students in the industry, followed by FIRE and public administration with less than 1000 students in each (@fig-majors-industries).
+
+FIRE, public administration, and construction are the most popular industries for all four majors with around 11000, 7500, and 6000 students respectively. Other industries like wholesale trade, utilities, and manufacturing have less than 300 students (@fig-majors-industries).
 
 ```{r, fig.width = 10, fig.height = 5}
 #| echo: false
@@ -188,27 +274,30 @@ applied_science_ind <-
 ggarrange(arts_ind, business_ind, sciences_ind, applied_science_ind, ncol = 2, nrow = 2)
 ```
 
-(@fig-majors-income)
+## Which Industries pay the Highest Wages?
+Now the popular industries of public administration, FIRE, and construction can be compared with less popular ones to determine if industry choice has an effect on income for each of the four majors. For this, the less popular industries of wholesale trade, rental/leasing, and management firms are selected. Wage income in all industries are normally distributed and skews right (@fig-majors-income). 
+
+Public administration and Construction both have a median income of around 41000 USD, with FIRE's median being slightly higher at 46565 (@fig-majors-income) (@tbl-industry-income-summary). This lines up with median income information for arts and business students. Business students have a relatively higher wage income because their preferred industry, FIRE, has a higher median income. Applied science students on the other hand have the highest median wage income, but the construction industry' is slight's median is much lower, with a difference of $57427 - 42925 = 14502$USD. Science students also choose to go into the same industries of public administration, FIRE, and construction but have a lower median income than the median of any industry (@tbl-industry-income-summary)(@tbl-majors-income-summary).
 
 ```{r, fig.width = 10, fig.height = 3}
 #| echo: false
 #| eval: true
-#| label: fig1-industries-high-income
-#| labe2: fig1-industries-low-income
-#| fig-cap: Bar Graph of Preferred Industries for Business, Arts, Sciences, and Applied Sciences Majors
+#| label: fig-popular-industries-income
+#| fig-cap: Histogram of Wage Income in the Popular Industries of Public Administration, FIRE, and Construction
 #| warning: false
 
 publ <- subset(cleaned_majors_data, Industry %in% "Public Administration")
 fir <- subset(cleaned_majors_data, Industry %in% "FIRE")
 cons <- subset(cleaned_majors_data, Industry %in% "Construction") 
 whol <- subset(cleaned_majors_data, Industry %in% "Wholesale Trade")
-util <- subset(cleaned_majors_data, Industry %in% "Utilities") 
+mana <- subset(cleaned_majors_data, Industry %in% "Management Firms")
+rent <- subset(cleaned_majors_data, Industry %in% "Rental/Leasing") 
 
 
 public_admin <-
   publ |>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
@@ -217,7 +306,7 @@ public_admin <-
 fire <-
   fir |>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
@@ -226,73 +315,149 @@ fire <-
 construct <-
   cons|>
   ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 5000) +
   scale_x_continuous(labels = scales::comma) +
   xlim(0, 200000) +
   theme_minimal() +
   labs(title = "Construction", x = "Wage Income")
 
-wholesale_trd <-
-  whol |>
-  ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
-  scale_x_continuous(labels = scales::comma) +
-  xlim(0, 200000) +
-  theme_minimal() +
-  labs(title = "Wholesale Trade", x = "Wage Income")
-
-utilities <-
-  util|>
-  ggplot(aes(x =INCWAGE)) +
-  geom_histogram() +
-  scale_x_continuous(labels = scales::comma) +
-  xlim(0, 200000) +
-  theme_minimal() +
-  labs(title = "Utilities", x = "Wage Income")
-
 ggarrange(public_admin, fire, construct, ncol = 3)
-ggarrange(wholesale_trd, utilities, ncol = 2)
 
 ```
+
 
 ```{r}
 #| echo: false
 #| eval: true
 #| label: tbl-industry-income-summary
-#| tbl-cap: Summary Statistics of Public Administration, FIRE, Construction, Wholesale Trade, and Utilities Wage Income
+#| tbl-cap: Summary Statistics of Public Administration, FIRE, Construction, Wholesale Trade, Rental/Leasing, and Management Firms Industries Wage Income
 #| warning: false
 
-#Summary Statistics
 public_administration_industry <- unclass(summary(publ$INCWAGE))
 fire_industry <- unclass(summary(fir$INCWAGE))
 construction_industry <- unclass(summary(cons$INCWAGE))
-wholesale_trade_industry <- unclass(summary(whol$INCWAGE))
-utilities_industry <- unclass(summary(util$INCWAGE))
-summary_industries <- data.frame(public_administration_industry, fire_industry, construction_industry, wholesale_trade_industry, utilities_industry,  check.names = FALSE, stringsAsFactors = FALSE)
+
+summary_industries <- data.frame(public_administration_industry, fire_industry, construction_industry, check.names = FALSE, stringsAsFactors = FALSE)
+
+summary_industries <-
+  summary_industries |>
+  rename("Public_Admin" = public_administration_industry, "FIRE" = fire_industry, "Construction" = construction_industry)
+
+summary_industries <-
+  cols_add(gt(summary_industries), summary_stats) |>
+  cols_move_to_start(summary_stats)
+
 summary_industries
 ```
 
-```
+Observing the three unpopular industries, wholesale trade has a median around 30000 USD and management firms and rental/leasing have a median around 50000 (@fig-unpopular-industries-income). This allows the higher and lower paying industries to be distinguished, FIRE has a higher median and mean income followed by public administration and construction (@tbl-industry-income-summary). 
 
 # Discussion
+## Which Undergraduate Majors Make the Most Money?
+Summary statistics and histograms of wage income for the four different majors indicate that applied science majors earn the most money followed by business, arts, and sciences students. This ranking is largely consistent with the findings of @CitePaper with the exception of science students. @CitePaper found that both technology/information management students, an applied science major, and business management & economics, had the highest mean wage income of just over 60000 USD. @CitePaper also found that arts majors like psychology and sociology had average wage around 40000 USD which is also consistent with our analysis. However, a discrepancy are science majors. In @CitePaper, mathematics majors had an average income of 50000 USD which differs by approximately 5000 USD from the mean income of 45427 USD from @tbl-major-summary-income. This significant difference is likely due to the only math majors being analysed in @CitePaper. Math majors only represent 7% of the data set and could have been an outlier earning significantly more income than the average sciences major. 
 
-## First discussion point {#sec-first-point}
+With this we can rank the four majors by average income from highest to lowest: applied science, business, arts, science with income of 59636 USD, 55104, 45699, and 45427 respectively. Observing the percentage differences between each major's wage income, arts and sciences majors only have a 0.6% difference in their mean income. The two high income majors of applied science and business earn approximately 30% and 20% more than arts and science majors respectively. Generalizing these results, an applied science major can expect to earn 8.2% more than a business major, 30.5% more than an arts major, and 31.3% more than a sciences major. And a business major can expect to earn 20.6% more than an arts major and 21.3% more than a sciences major.
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+Average individual income is approximately 37000 USD in 2017 (@CiteCensus) and average income for an individual with a bachelor's degree in any major is 50472 (@tbl-summary-cleaned-data), there is a $(50472-37000)/37000\approx36.4\%$ income increase for completing an undergraduate degree. The difference between the highest and lowest income majors is 31.3% which suggests that the choice of major has a similar amount of impact on income as the choice of pursuing an undergraduate degree or not.
 
-## Second discussion point
+$$
+\begin{aligned}
+Percent\ Difference
+\\
+Applied\ Science\ and\ Business&: (59636-55104)/55104\approx8.2\%
+\\
+Applied\ Science\ and\ Arts&: (59636-45699)/45699\approx30.5\%
+\\
+Applied\ Science\ and\ Sciences&: (59636-45427)/45427\approx31.3\%
+\\
+Business\ and\ Arts&: (55104-45699)/45699\approx20.6\%
+\\
+Business\ and\ Science&: (55104-45427)/45427\approx21.3\%
+\\
+Arts\ and\ Science&: (45699-45427)/45427\approx0.6\%
+\end{aligned}
+$$
 
-## Third discussion point
+## Is High Preferred Industry Income A Cause of High Income Majors?
+In the analysis of preferred industries, public administration, FIRE, and construction were the most popular for all four majors. Business majors disproportionately preferred FIRE, about half of applied science majors preferred construction and the other half was split between public administration and FIRE. Arts majors preferred public administration and FIRE, and sciences students preferred all three popular industries almost equally. Then from plotting histograms of wage income in each of the three popular industries, it can be established that FIRE has the highest average wage income of 57802 USD followed by construction with 45514 and public administration with 43075.
+
+These findings suggest that business majors are able to earn a higher income because they tend to pursue a career in the highest paying industry FIRE. Arts majors earn less than some majors and more than others because they tend to pursue careers in public administration which has relatively low average wages as well as FIRE. Science majors prefer public administration, FIRE, and construction almost equally, and construction and public administration are the lowest paying industries which is why they have the lowest average income. Both arts and science major's mean wage income coincides with the mean wage incomes of the public administration and construction industries.
+
+For applied science majors who have the highest average income, the findings are inconsistent because construction, the second lowest paying, is their preferred industry. Since income in each industry is normally distributed and skews right, this could be due to applied science majors obtaining higher paying roles in the construction industry as engineers. This would allow them to make significantly more than the average worker in the construction industry. Since the mean income for applied science majors 59636 USD is well within the 3rd quartile of the construction industry income of 62022, this could be the reason why applied science majors earn more than their industry average.
+
+
 
 ## Weaknesses and next steps
 
 Weaknesses and next steps should also be included.
 
-
+# Conclusion
 
 \newpage
+# Appendix
+```{r, fig.width = 10, fig.height = 3}
+#| echo: false
+#| eval: true
+#| label: fig-unpopular-industries-income
+#| fig-cap: Histogram of Wage Income in the Unpopular Industries of Wholesale Trade, Management Firms, and Rental/Leasing
+#| warning: false
 
+wholesale_trd <-
+  whol |>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram(binwidth = 5000) +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Wholesale Trade", x = "Wage Income")
 
+management <-
+  mana|>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram(binwidth = 5000) +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Management Firms", x = "Wage Income")
+
+rental <-
+  rent|>
+  ggplot(aes(x =INCWAGE)) +
+  geom_histogram(binwidth = 5000) +
+  scale_x_continuous(labels = scales::comma) +
+  xlim(0, 200000) +
+  theme_minimal() +
+  labs(title = "Rental/Leasing", x = "Wage Income")
+
+ggarrange(wholesale_trd, management, rental, ncol = 3)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-popular-and-unpoular-industries-income-summary
+#| tbl-cap: Summary Statistics of Wage Income in the Unpopular Industries of Wholesale Trade, Management Firms, and Rental/Leasing
+#| warning: false
+wholesale_trade_industry <- unclass(summary(whol$INCWAGE))
+rental_leasing_industry <- unclass(summary(rent$INCWAGE))
+management_firms_industry <- unclass(summary(mana$INCWAGE))
+
+summary_more_industries <- data.frame(public_administration_industry, fire_industry, construction_industry, wholesale_trade_industry, rental_leasing_industry, management_firms_industry, check.names = FALSE, stringsAsFactors = FALSE)
+
+summary_more_industries <-
+  summary_more_industries |>
+  rename("Public_Admin" = public_administration_industry, "FIRE" = fire_industry, "Construction" = construction_industry, "Wholesale Trade" = wholesale_trade_industry, "Rental/Leasing" = rental_leasing_industry, "Management Firms" = management_firms_industry)
+
+summary_more_industries <-
+  cols_add(gt(summary_more_industries), summary_stats) |>
+  cols_move_to_start(summary_stats)
+
+cols_width(summary_more_industries, everything() ~ pct(16))
+
+```
+With analysis of other less popular industries, the popular industries can be ranked into high paying, mid-range, and low paying. FIRE is the highest paying industry followed by renting/leasing and management firms, then wholesale trade, construction, and public administration.
+
+\newpage
 # References
 
 

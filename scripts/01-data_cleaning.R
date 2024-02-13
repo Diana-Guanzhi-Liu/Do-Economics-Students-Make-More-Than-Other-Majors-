@@ -14,7 +14,7 @@ load("/cloud/project/Inputs/Raw Data/ACS_Data_UCSCEcon_NAICS.Rda")
 Industry <- read.csv("/cloud/project/Inputs/Raw Data/NAICS2_to_Names.csv")
 Majors <- readxl::read_xlsx("/cloud/project/Inputs/Raw Data/DEGFIELD_Code and Label.xlsx")
 
-#Simplify and add Industry and Major name to UCSC Student Data
+#Remove unnecessary variables  and add Industry and Major name to UCSC Student Data
 cleaned_majors_data <- 
   acs |>
   select(YEAR, DEGFIELD, INCWAGE, INDNAICS)
