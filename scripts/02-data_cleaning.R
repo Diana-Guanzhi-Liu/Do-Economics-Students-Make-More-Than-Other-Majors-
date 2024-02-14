@@ -26,6 +26,7 @@ Industry <- as.data.frame(Industry)
 Majors <- as.data.frame(Majors)
 cleaned_majors_data <- inner_join(cleaned_majors_data, Industry, by = "INDNAICS")
 cleaned_majors_data <- inner_join(cleaned_majors_data, Majors, by = "DEGFIELD")
+cleaned_majors_data$INCWAGE <- round(cleaned_majors_data$INCWAGE, digits = 0)
 head(cleaned_majors_data)
 
 #### Save data ####
