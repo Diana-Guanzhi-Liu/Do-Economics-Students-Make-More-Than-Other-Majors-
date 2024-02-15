@@ -5,7 +5,7 @@ author: Diana Liu
 thanks: "Code and data are available at: https://github.com/Diana-Guanzhi-Liu/Do-Economics-Students-Make-More-Than-Other-Majors-. Replication DOI: https://doi.org/10.48152/ssrp-m299-mq34."
 date: 13 February 2024
 date-format: long
-abstract: "This paper answers the question of which majors yield the highest returns in terms of income, analyzing data from students in the arts, sciences, business, and applied science disciplines. Through an examination of mean and median incomes and distributions across these categories, we identify applied science majors as yielding the highest returns, followed by business, arts, and science majors. Differences in mean incomes among majors can be partially explained by their preferred industries of employment. While business majors tend to gravitate towards higher-paying sectors such as finance, insurance, and real estate (FIRE), arts and science majors often find themselves in lower-paying industries like public administration and construction. Notably, applied science majors, despite preferring the construction industry, exhibit superior earnings, suggesting a capacity to secure high-paying positions within a traditionally lower-paying industry due to above average knowledge from relevant coursework."
+abstract: "This paper answers the question of which majors yield the highest returns in terms of income, analyzing data from students in the arts, sciences, business, and applied science disciplines. Through an examination of mean and median incomes and distributions across these categories, we identify applied science majors as earning the highest mean and median income, followed by business, arts, and science majors. Differences in mean incomes among majors can be partially explained by their preferred industries of employment. While business majors tend to gravitate towards higher-paying sectors such as finance, insurance, and real estate (FIRE), arts and science majors often find themselves in lower-paying industries like public administration and construction. Notably, applied science majors, despite preferring the construction industry, exhibit superior earnings, suggesting a capacity to secure high-paying positions within a traditionally lower-paying industry due to above average knowledge from relevant coursework. By knowing what degrees earn the most income, prospective students will be able to make better informed decisions about their choice of major, and plan their education around their financial goals."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -31,19 +31,19 @@ library(tinytex)
 
 
 # Introduction
-The majority of college and university students cite higher income potential as one of the main reasons for choosing their degree. By knowing what degrees earn the most income, prospective students will be able to make better informed decisions about their choice of major, and plan their education around their financial goals. The return to a major is the increase in income that is the result of choosing the specific major, so the estimand is the return to majoring in either arts, business, sciences, or applied science.
+The majority of college and university students cite higher income potential as one of the main reasons for choosing their degree. By knowing what degrees earn the most income, prospective students will be able to make better informed decisions about their choice of major, and plan their education around their financial goals. The return to a major is defined as the increase in income that is the result of choosing the specific major. Previous research in this area have identified specific majors as having high returns, such as"Will Studying Economics Make You Rich? A Regression Discontinuity Analysis of the Returns to College Major" [@CitePaper] who found that economics majors had one of the highest returns. We want to use the same data set and investigate broader categories of majors. We categorize all majors into either arts, business, sciences, or applied science and study the effects choosing one of these categories on income.
 
-This paper uses the same data set as "Will Studying Economics Make You Rich? A Regression Discontinuity Analysis of the Returns to College Major" [@CitePaper] who found that economics majors had one of the highest returns. We want to use a similar line of reasoning to rank the categories of majors: arts, business, science, or applied science by highest to lowest returns. 
+In the results section we analyse the mean, median, and distribution of income and rank the majors from highest to lowest returns. There are two alternatives for which we calculate returns. Alternative one is choosing a major at random and alternative two is not getting a bachelor's degree. Then we examine whether or not the differences in mean income among majors can be explained by the individual's preferred industry of employment. This is done through analyzing how many students from each major go into each industry and the mean income of said industry, examining whether or not the mean income of the preferred industries coincide with the mean income of the major.
 
-In the results section we analyse the mean, median, and distribution of income and rank the majors from highest to lowest returns. Then examine whether or not the differences in mean income among majors can be explained by their preferred industry of employment. This is done through analyzing each major's preferred industry and the mean income of said industry, examining whether or not the mean income of the preferred industries coincide with the mean income of the major.
+We found that applied science majors had the highest mean wage income of 59636 USD, followed by business 55104, arts 45699, and science 45427 (@tbl-majors-income-summary). With this, we were able to calculate each major's returns. Applied science had additional earnings of 9164 USD above the income of the average bachelors' degree holder, and business majors have a positive return of 4632. Arts have a negative return of -4773 and science -5045. For returns in excess of not having a degree, applied science has 22636, followed by business with 18104, arts with 8699, and science with 8427. If the alternative to majoring in any of the four categories is to choose a major at random, an individual is better off by majoring in applied science or business, and worse off by majoring in arts or science. And if the alternative to majoring in any of the four categories is to not have a bachelor's degree, an individual is best off majoring in applied science, followed by business, arts and sciences.
 
-In the discussion section, we found that applied science majors had the highest returns with mean wage income of 59636 USD, followed by business 55104, arts 45699, and science 45427 (@tbl-majors-income-summary). Some of the returns can be explained by preferred industry. Business majors preferred the finance insurance and real-estate industry (FIRE) which is the highest paying industry with a mean income of 57802 USD (@tbl-industry-income-summary). Arts and Science majors preferred the public administration, FIRE, and construction industries. Public administration and construction are the two lowest paying industries with mean income of 43075 45514 respectively, coinciding with the mean income of arts and science majors(@tbl-industry-income-summary)(@tbl-majors-income-summary). An explanation to why their preference for the FIRE industry did not increase mean income for arts and science majors is that they hold lower paying positions in the industry than business majors due to a lack of relevant coursework and knowledge. Applied science majors earn the highest mean income but prefer the construction industry which has low mean income. This is likely due to applied science majors holding high paying positions within a low paying industry as they have more knowledge and training from coursework than the average worker in the industry.
+In the discussion section, we examine if some of the returns can be explained by preferred industry. Business majors preferred the finance insurance and real-estate industry (FIRE) which is the highest paying industry with a mean income of 57802 USD (@tbl-industry-income-summary). Arts and Science majors preferred the public administration, FIRE, and construction industries. Public administration and construction are the two lowest paying industries with mean income of 43075 and 45514 respectively, coinciding with the mean income of arts and science majors (@tbl-industry-income-summary) (@tbl-majors-income-summary). An explanation to why their preference for the FIRE industry did not increase mean income for arts and science majors is that they hold lower paying positions in the industry than business majors due to a lack of relevant coursework and knowledge. Applied science majors earn the highest mean income but prefer the construction industry which has low mean income. This is likely due to applied science majors holding high paying positions within a low paying industry as they have more knowledge and training from coursework than the average worker in the industry.
 
 # Data
 
-The authors of the original paper took public student data from the University of California, Santa Cruz (UCSC) registrar for their analysis. This data set contains all newly admitted students between 1999 and 2014, for each student, the original publication observes many variables like race, SAT score, and GPA that this paper will not cover. These additional variables are removed during the data cleaning process leaving remaining variables of YEAR, DEGFIELD, INCWAGE, and INDNAICS. The original paper has already constructed and cleaned the data, additional cleaning of the data set. This paper was written using R [@CiteR] and further analysis was performed with tidyverse [@CiteTidy], gt [@CiteGt], shiny [@CiteShiny], ggplot2 [@CiteGgplot2], scales [@CiteScales], psych [@CitePsych], dplyr [@CiteDplyr], vtable[@CiteVtable] and ggpubr [@CiteGgpubr].
+The authors of the original paper took public student data from the University of California, Santa Cruz (UCSC) registrar for their analysis and combined it with survey data of former students who were asked to self report their wage income on their tax filings and industry of employment. The data is cleaned by removing additional variables that our analysis does not use, leaving remaining variables of YEAR, DEGFIELD, INCWAGE, and INDNAICS. This paper was written using R [@CiteR] and further analysis was performed with tidyverse [@CiteTidy], gt [@CiteGt], shiny [@CiteShiny], ggplot2 [@CiteGgplot2], scales [@CiteScales], psych [@CitePsych], dplyr [@CiteDplyr], vtable[@CiteVtable] and ggpubr [@CiteGgpubr].
 
-Similar data sets from other schools can be used to verify the results produced by UCSC data. Taking student data from schools in different regions of the US or from different countries can make the results more generalizable, this is discussed further in the weaknesses and next steps section.
+Similar data sets from other schools exist and can be used to verify the results produced by UCSC data. Taking student data from schools in different regions of the US or from different countries can make the results more generalizable, this is discussed further in the weaknesses and next steps section.
 
 ## Time Span
 The cleaned data set contains student data from 2009 to 2017 with approximately 4000 observations each year except in 2011, 2012, and 2015 where the data is missing. There is a total of 24857 observations of student data that will be included in the analysis.
@@ -67,11 +67,11 @@ count(filter(cleaned_majors_data, YEAR == 2017))
 ```
 
 ## Major of Study
-DEGFIELD is a 2 digit code that specifies the primary major of study each student is enrolled in. Using a spreadsheet of DEGFIELD codes and its corresponding major provided by IPUMS USA[^2], each code can be matched to the student's major. For example, the code 62 corresponds to the label "Business" seen in the first row of @tbl-cleaned-data. This matching creates a new column called Label, referring to the name of the major the student studies.
+DEGFIELD is a 2 digit code that specifies the primary major of study each student is enrolled in. Using a spreadsheet of DEGFIELD codes and its corresponding major provided by IPUMS USA[^1], each code can be matched to the student's major. For example, the code 62 corresponds to the label "Business" seen in the first row of @tbl-cleaned-data. This matching creates a new column called Label, referring to the name of the major the student studies.
 
-The specific majors are placed into 4 categories: Arts, Sciences, Business, and Applied Science. Arts contains fine art and humanities majors like Philosophy and Religious Studies, Social Sciences, and History. Sciences contains majors like Agriculture, Mathematics, and Life Sciences. Applied science contains majors like Engineering. Finally, Business is its own category. There are a total of 10972 observations in Arts, 7693 in Business, 3362 in Applied Science and 2617 in Science (@tbl-count-majors).
+The specific majors are placed into 4 categories: Arts, Sciences, Business, and Applied Science. There are a total of 10972 observations in Arts, 7693 in Business, 3362 in Applied Science and 2617 in Science (@tbl-count-majors).
 
-[^2]: IPUMS USA collects public census data https://usa.ipums.org/usa-action/variables/DEGFIELD#description_section
+[^1]: IPUMS USA collects public census data https://usa.ipums.org/usa-action/variables/DEGFIELD#description_section
 
 ```{r}
 #| echo: false
@@ -88,7 +88,7 @@ Applied_Science <- c("Computer and Information Sciences", "Engineering", "Engine
 
 business <- subset(cleaned_majors_data, Label %in% Business)
 sciences <- subset(cleaned_majors_data, Label %in% Sciences)
-arts <- subset(cleaned_majors_data, Label %in% Arts)
+arts <- subset(cleaned_majors_data, Label %in% Arts | INCWAGE)
 applied_science <- subset(cleaned_majors_data, Label %in% Applied_Science)
 
 ```
@@ -109,19 +109,17 @@ tab_footnote(gt(count_majors), "Note: Arts has the most students with over 10,00
 ```
 
 ## Wage Income
-INCWAGE refers to the wage income that was reported by the students after graduation in USD. This variable was constructed by @CitePaper from the survey results of biannual UC Undergraduate Experience Survey (UCUES), conducted online in the spring of even-numbered years.
+INCWAGE refers to the wage income that was reported by the students after graduation in USD. This variable was constructed by @CitePaper from the survey results of biannual UC Undergraduate Experience Survey (UCUES), conducted online and answered by former students. The survey asked students to report their employment income from their most recent tax return [^2]. Since the wage income is self reported, measurement error is difficult to determine and non response bias could affect the results. In analysis, wage income is truncated to between 0 and 200000 USD to prevent the mean and other calculations from being skewed by outliers.
 
-The estimand in @CitePaper as well as this paper is the wage income of former students. Wage income is defined as the income from the individual's primary employment, excluding investments, the sale of property, and additional jobs. Since the wage income is self reported, measurement error is difficult to determine and non response bias could affect the results. The possibility of non response bias from former students who did not respond to the survey being systematically different than those who did is explored further in the weaknesses and next steps section. In later analysis, wage income is truncated to between 0 and 200000 USD to prevent the mean and other calculations from being skewed by outliers.
+From summary statistics, the lowest reported wage income was 106 USD and the highest was 690189, with a mean of 50472 and median of 43645. Median income according to US Census Data from around the same time period is approximately 37000 [@CiteCensus], supporting the claim that individuals who complete an undergraduate degree earn more on average than those who do not.
 
-From summary statistics, the lowest reported wage income was 106 USD and the highest was 690189, with a mean of 50472 and median of 43645 (@tbl-summary-cleaned-data). Median income according to US Census Data from around the same time period is approximately 37000 [@CiteCensus], supporting the claim that individuals who complete an undergraduate degree earn more on average than those who do not. In this paper, the wage income of students in each category is compared to determine which majors earn the most income on average. 
+[^2]: IRS Form 1040 1-a: Total amounts from form W-2, box 1
 
 ```{r}
 #| echo: false
 #| eval: true
 #| warning: false
-#| label: tbl-summary-cleaned-data
-#| tbl-cap: "Summary statistics of wage income of all UCSC students from 2009 to 2017 rounded to the nearest dollar"
-
+#| include: false
 all_students <- unclass(summary(cleaned_majors_data$INCWAGE, digits = 5))
 data_summary <- data.frame(all_students)
 summary_stats <- c("Min", "1st Quartile", "Median", "Mean", "3rd Quartile", "Max")
@@ -129,16 +127,15 @@ summary_all_students <-
   cols_add(gt(data_summary), summary_stats) |>
   cols_move_to_start(summary_stats)
 
-tab_footnote(summary_all_students, "Note: UCSC students who attained an undergraduate degree in any major had an average income of 50472 USD")
-
+summary_all_students
 ```
 
 ## Industry of Employment
 The North American Industry Classification System (NAICS) is a system of numerical codes that correspond to specific industries, INDNAICS takes the first 2 digits of the NAICS code which refers to broader categories of industries(@tbl-cleaned-data). For example, 111110 is the NAICS code for soybean farming, its first two digits 11 is the general industry of agriculture. Each observation in the data set of the code is mapped to its industry name, creating a new Industry column.
 
-Industry was also self reported by former students in the same UCUES survey as wage income. There are 20 general industries, but students only reported Wholesale Trade, Utilities, Rental/Leasing, Public Administration, Manufacturing, Management Firms, Finance Insurance Real Estate (FIRE), and Construction. The analysis will focus on the most popular industries which are Public Administration, FIRE, and Construction as well as two less popular industries of Utilities and Wholesale Trade.
+Industry was also self reported by former students in the same UCUES survey. There are 20 general industries, but the vast majority of students reported in only six industries: Wholesale Trade, Utilities, Rental/Leasing, Public Administration, Manufacturing, Management Firms, Finance Insurance Real Estate (FIRE), and Construction, so the remaining industries with very few students were removed in cleaning by @CitePaper. The analysis will focus on the most popular industries which are Public Administration, FIRE, and Construction.
 
-There are two components of industry that are analyzed in this paper. First, the most popular industries for each category of majors are determined, this establishes a relationship between the major an individual studies and the industry they choose to work in. For example, a business student would be more likely to work in FIRE than manufacturing. Then we calculate the median income of each industry to explain that the difference in the wage income of different majors stem from employment in more or less profitable industries. 
+There are two components of industry that are analyzed in this paper. First, the most popular industries for each category of majors are determined by counting how many students in each major become employed in each industry. Then we calculate the mean income of each industry to determine if the difference in the wage income of different majors stem from employment in more or less profitable industries. 
 
 ```{r, fig.width = 6, fig.height = 5}
 #| label: tbl-cleaned-data
@@ -147,7 +144,7 @@ There are two components of industry that are analyzed in this paper. First, the
 #| warning: false
 #| message: false
 
-cols_width(gt(head(cleaned_majors_data)), everything() ~ pct(15))
+cols_width(gt(head(cleaned_majors_data)), everything() ~ pct(17))
 ```
 
 # Results
@@ -175,9 +172,9 @@ summary_majors <-
   cols_add(gt(summary_majors), summary_stats) |>
   cols_move_to_start(summary_stats)
 
-tab_footnote(summary_majors, "Applied science majors have the highest mean income of 59636 USD, followed by business majors with 55104, then arts majors 45699, and science majors 45427.")
+tab_footnote(summary_majors, "Note: Applied science majors have the highest mean income of 59636 USD, followed by business majors with 55104, then arts majors 45699, and science majors 45427.")
 ```
-By plotting wage income for all majors on separate histograms, we can see that wage income is normally distributed and skews right (@fig-majors-income). For the histograms, max wage income is truncated to 200000 so that the main distribution curve can be zoomed in on. The bin width is 5000 USD as 40 bins per histogram is a size that is optimal for visualizing the distribution without the graph looking too busy. The Like the summary statistics the median for arts, sciences, and business majors are just under 50000 while for applied science majors it is over 50000 (@fig-majors-income).
+Wage income is normally distributed and skews right (@fig-majors-income). For the histograms, max wage income is truncated to 200000 so that the main distribution curve can be zoomed in on. The bin width is 5000 USD as 40 bins per histogram is a size that is optimal for visualizing the distribution. Like the summary statistics the median for arts, sciences, and business majors are just under 50000 while for applied science majors it is over 50000 (@fig-majors-income).
 
 ```{r, fig.width = 10, fig.height = 5}
 #| echo: false
@@ -225,6 +222,34 @@ applied_science_hist <-
 ggarrange(arts_hist, business_hist, science_hist, applied_science_hist, ncol=2, nrow = 2)
   
 ```
+Now we calculate each major's returns in two alternative scenarios. Scenario one is the return of the major above the average income of a bachelor's degree holder, this assumes that the alternative to choosing a major in one of the four categories is selecting a major at random. Applied science have the highest return of 9164 USD above the income of the average bachelors' degree holder, and business majors have a positive return of 4632. Arts have a negative return of -4773 and science -5045.
+
+Scenario two assumes the alternative to majoring in one of the four categories is to not obtain a bachelor's degree. This return is the additional income of each major over the median income of individuals with no degree. Applied science has the highest return of 22636, followed by business with 18104, arts with 8699, and science with 8427.
+
+$$
+\begin{aligned}
+Return\ on\ Major-Average\ Bachelor's\ Degree
+\\
+Applied\ Science&: 59636-50472=9164
+\\
+Arts&: 45699-50472=-4773
+\\
+Sciences&: 45427-50472=-5045
+\\
+Business&: 55104-50472=4632
+\\
+Return\ on\ Major-No\ Degree
+\\
+Applied\ Science&: 59636-37000=22636
+\\
+Arts&: 45699-37000=8699
+\\
+Sciences&: 45427-37000=8427
+\\
+Business&: 55104-37000=18104
+\\
+\end{aligned}
+$$
 
 ## Analysis of Preferred Industry
 For each major, student data about the individual's self-reported industry is plotted on a bar graph. Arts majors prefer to go into the public administration industry the most with nearly 5000 students going into the industry, followed by the finance insurance real-estate (FIRE) 4000, and construction 2000. Business majors unsurprisingly prefer FIRE with over 5000 students choosing it. Construction, public administration and management firms are far less popular, with under 1000 in each. Science majors prefer public administration, FIRE, and construction almost equally with approximately 1000 students in each industry. Lastly, applied science majors prefer construction with 2000 students in the industry, followed by FIRE and public administration with less than 1000 students in each (@fig-majors-industries).
@@ -275,9 +300,7 @@ ggarrange(arts_ind, business_ind, sciences_ind, applied_science_ind, ncol = 2, n
 ```
 
 ## Analysis of Industry Income
-Now the popular industries of public administration, FIRE, and construction can be compared with less popular ones to determine if industry choice has an effect on income for each of the four majors. For this, the less popular industries of wholesale trade, rental/leasing, and management firms are selected. Wage income in all industries are normally distributed and skews right (@fig-majors-income). 
-
-Public administration and Construction both have a median income of around 41000 USD, with FIRE's median being slightly higher at 46565 (@fig-majors-income) (@tbl-industry-income-summary). This lines up with median income information for arts and business students. Business students have a relatively higher wage income because their preferred industry, FIRE, has a higher median income. Applied science students on the other hand have the highest median wage income, but the construction industry' is slight's median is much lower, with a difference of $57427 - 42925 = 14502$USD. Science students also choose to go into the same industries of public administration, FIRE, and construction but have a lower median income than the median of any industry (@tbl-industry-income-summary)(@tbl-majors-income-summary).
+Public administration and Construction both have a median income of around 41000 USD, with FIRE's median being slightly higher at 46565 (@fig-majors-income) (@tbl-industry-income-summary). This lines up with median income information for arts and business students. Business students have a relatively higher wage income because their preferred industry, FIRE, has a higher median income. Applied science students on the other hand have the highest median wage income, but the construction industry's median is much lower, with a difference of $57427 - 42925 = 14502$USD. Science students also choose to go into the same industries of public administration, FIRE, and construction but have a lower median income than the median of any industry (@tbl-industry-income-summary)(@tbl-majors-income-summary).
 
 ```{r, fig.width = 10, fig.height = 3}
 #| echo: false
@@ -347,62 +370,49 @@ summary_industries <-
   cols_add(gt(summary_industries), summary_stats) |>
   cols_move_to_start(summary_stats)
 
-tab_footnote(summary_industries, "The FIRE industry has the highest mean income with 57802. Construction had the next highest income with 45514. Public administration has the lowest mean income of 43075. We can rank the popular industries from high-paying to low-paying: FIRE, construction, public administration")
+tab_footnote(summary_industries, "Note: The FIRE industry has the highest mean income with 57802. Construction had the next highest income with 45514. Public administration has the lowest mean income of 43075. We can rank the popular industries from high-paying to low-paying: FIRE, construction, public administration")
 ```
 
 Observing the three unpopular industries, wholesale trade has a median around 30000 USD and management firms and rental/leasing have a median around 50000 (@fig-unpopular-industries-income). This allows the higher and lower paying industries to be distinguished, FIRE has a higher median and mean income followed by public administration and construction (@tbl-industry-income-summary). 
 
 # Discussion
 ## Which Undergraduate Majors Make the Most Money?
-Summary statistics and histograms of wage income for the four different majors indicate that applied science majors earn the most money followed by business, arts, and sciences students. This ranking is largely consistent with the findings of @CitePaper with the exception of science students. @CitePaper found that both technology/information management students, an applied science major, and business management & economics, had the highest mean wage income of just over 60000 USD. @CitePaper also found that arts majors like psychology and sociology had average wage around 40000 USD which is also consistent with our analysis. However, a discrepancy are science majors. In @CitePaper, mathematics majors had an average income of 50000 USD which differs by approximately 5000 USD from the mean income of 45427 USD from @tbl-major-summary-income. This significant difference is likely due to the only math majors being analysed in @CitePaper. Math majors only represent 7% of the data set and could have been an outlier earning significantly more income than the average sciences major. 
+Summary statistics and histograms of wage income for the four different majors indicate that applied science majors earn the most money followed by business, arts, and sciences students. This ranking is largely consistent with the findings of @CitePaper with the exception of science students. @CitePaper found that both technology/information management students, an applied science major, and business management & economics, had the highest mean wage income of just over 60000 USD. @CitePaper also found that arts majors like psychology and sociology had average wage around 40000 USD which is also consistent with our analysis. However, a discrepancy are science majors. In @CitePaper, mathematics majors had an average income of 50000 USD which differs by approximately 5000 USD from the mean income of 45427 USD from @ttbl-majors-income-summary. This significant difference is likely due to the only math majors being analysed in @CitePaper. Math majors only represent 7% of the data set and could have been an outlier earning significantly more income than the average sciences major. Observing the percentage differences between each major's wage income, arts and sciences majors only have a 0.6% difference in their mean income. The two high income majors of applied science and business earn approximately 30% and 20% more than arts and science majors respectively.
 
-With this we can rank the four majors by average income from highest to lowest: applied science, business, arts, science with income of 59636 USD, 55104, 45699, and 45427 respectively. Observing the percentage differences between each major's wage income, arts and sciences majors only have a 0.6% difference in their mean income. The two high income majors of applied science and business earn approximately 30% and 20% more than arts and science majors respectively. Generalizing these results, an applied science major can expect to earn 8.2% more than a business major, 30.5% more than an arts major, and 31.3% more than a sciences major. And a business major can expect to earn 20.6% more than an arts major and 21.3% more than a sciences major.
+In terms of returns, the ranking does not change. Excess income from choosing one of the four majors compared to the average income of any bachelor's degree are 9164 USD for applied science, 4632 for business, -4773 for arts, and -5045 for science. This suggests that a prospective student will earn an additional income of 9164 if they choose to major in applied science compared to choosing a random major. Since returns are negative for arts and science, a prospective student is better off in terms of annual income if they choose a major at random than if they were to major in arts or science. If the alternative to majoring in one of the four categories is to not obtain a bachelor's degree, applied science has the highest return of 22636, followed by business with 18104, arts with 8699, and science with 8427. Now, a student will still be best off choosing applied science which will earn them an additional 22636 per year. Arts and science returns are now positive, so between choosing to major in either one or not obtaining a bachelor's degree, a student is better off majoring in arts or science.
 
 Average individual income is approximately 37000 USD in 2017 [@CiteCensus] and average income for an individual with a bachelor's degree in any major is 50472 (@tbl-summary-cleaned-data), there is a $(50472-37000)/37000\approx36.4\%$ income increase for completing an undergraduate degree. The difference between the highest and lowest income majors is 31.3% which suggests that the choice of major has a similar amount of impact on income as the choice of pursuing an undergraduate degree or not.
 
-$$
-\begin{aligned}
-Percent\ Difference
-\\
-Applied\ Science\ and\ Business&: (59636-55104)/55104\approx8.2\%
-\\
-Applied\ Science\ and\ Arts&: (59636-45699)/45699\approx30.5\%
-\\
-Applied\ Science\ and\ Sciences&: (59636-45427)/45427\approx31.3\%
-\\
-Business\ and\ Arts&: (55104-45699)/45699\approx20.6\%
-\\
-Business\ and\ Science&: (55104-45427)/45427\approx21.3\%
-\\
-Arts\ and\ Science&: (45699-45427)/45427\approx0.6\%
-\end{aligned}
-$$
-
 ## Is High Preferred Industry Income A Cause of High Income Majors?
-In the analysis of preferred industries, public administration, FIRE, and construction were the most popular for all four majors. Business majors disproportionately preferred FIRE, about half of applied science majors preferred construction and the other half was split between public administration and FIRE. Arts majors preferred public administration and FIRE, and sciences students preferred all three popular industries almost equally. Then from plotting histograms of wage income in each of the three popular industries, it can be established that FIRE has the highest average wage income of 57802 USD followed by construction with 45514 and public administration with 43075.
+In the analysis of preferred industries, public administration, FIRE, and construction were the most popular for all four majors. Business majors disproportionately preferred FIRE. About half of applied science majors preferred construction and the other half was split between public administration and FIRE. Arts majors preferred public administration and FIRE. Sciences students preferred all three popular industries almost equally.
 
-These findings suggest that business majors are able to earn a higher income because they tend to pursue a career in the highest paying industry, FIRE. The mean income of business majors 55104 USD is quite close to the mean income of the FIRE industry of 57802. The slight difference could be due to that construction and public administration which have a lower mean income than FIRE are business majors' second and third preferred industries, thus lowering the overall average for the major. 
+FIRE has the highest average wage income of 57802 USD followed by construction with 45514 and public administration with 43075. These findings suggest that business majors are able to earn a higher income because they tend to pursue a career in the highest paying industry, FIRE. The mean income of business majors is quite close to the mean income of the FIRE industry. The slight difference could be due to construction and public administration which have a lower mean income than FIRE being business majors' second and third preferred industries, lowering the overall average for the major. 
 
-Science majors prefer public administration, FIRE, and construction almost equally, and construction and public administration are the lowest paying industries, this is likely to be the reason why they have the lowest average income. Science majors' mean wage income is 45427 USD, which coincides with the mean income of the construction 45514 and public administration industries 43074. FIRE which has a substantially higher mean income than the other two industries would be expected to increase the mean for science majors, but this is not the case. One explanation could be due to science majors holding lower than average income roles in the FIRE industry. Science majors who pursue careers in the FIRE industry are likely to have less relevant training than business majors due to the different courses each major has to take to achieve their degree. Since science majors have less relevant course work and therefore knowledge in the FIRE industry, they are more likely to get below average income positions.
+Science majors prefer public administration, FIRE, and construction almost equally, and construction and public administration are the lowest paying industries, this is likely to be the reason why they have the lowest average income. Science majors' mean wage income coincides with the mean income of the construction and public administration industries. FIRE which has a substantially higher mean income than the other two industries would be expected to increase the mean for science majors, but this is not the case. One explanation could be due to science majors holding lower income roles than average in the FIRE industry. Science majors who pursue careers in the FIRE industry are likely to have less relevant training and knowledge than business majors due to the different courses each major has to take to achieve their degree. Since science majors have less relevant coursework, they are more likely to get below average income positions.
 
-Arts majors earn less than some majors and more than others because they tend to pursue careers in public administration and construction which have relatively low average wages as well as FIRE. Their mean wage income of 45699 is slightly higher the mean wage income of the public administration 43074 and construction 45514 industries and well below that of the fire industry 57802. This could be due to the same reason as science majors earning less in the industry, a lack of relevant coursework and knowledge. Another explanation is that there are far more arts students prefer public administration and construction which lowers the mean income for the arts major compared to preferring public administration, construction, and FIRE industries equally.
+Arts majors earn less than applied science and business majors and more science majors because they tend to pursue careers in public administration and construction which have relatively low average wages as well as FIRE. Their mean wage income is slightly higher the mean wage income of the public administration and construction industries and well below that of the fire industry 57802. This could be due to the same reason as science majors earning less in the industry, a lack of relevant coursework and knowledge. Another explanation is that there are far more arts students prefer public administration and construction which lowers the mean income for the arts major compared to preferring public administration, construction, and FIRE industries equally.
 
-For applied science majors who have the highest average income, the findings are inconsistent because construction, the second lowest paying, is their preferred industry. Since income in each industry is normally distributed and skews right, this could be due to applied science majors obtaining higher paying roles in the construction industry as engineers. This would allow them to make significantly more than the average worker in the construction industry. Since the mean income for applied science majors 59636 USD is well within the 3rd quartile of the construction industry income of 62022, this could be the reason why applied science majors earn more than their industry average.
+For applied science majors who have the highest average income, the findings are inconsistent because construction, the second lowest paying, is their preferred industry. Since income in each industry is normally distributed and skews right, this could be due to applied science majors obtaining higher paying roles in the construction industry as a result of superior knowledge from their coursework. This would allow them to make significantly more than the average worker in the construction industry. Since the mean income for applied science majors is well within the 3rd quartile of the construction industry income, this could be the reason why applied science majors earn more than their industry average.
 
 ## Weaknesses and next steps
 The biggest weakness of this analysis is that the data comes from one university UCSC. UCSC is a moderately selective public university where nearly all students attain a bachelors degree [@CitePaper]. So the possibility that their students' results are systematically different from all other students in the US and therefore cannot be generalized cannot be ruled out.
 
-Another weakness is that wage income and industry of employment are self reported by students who participated in the UC Undergraduate Experience Survey, this means that non response error could affect the results of the analysis. Former students who answered the survey can be systematically different from those who did not in a variety of ways. For instance, students who make significantly less than average may feel embarrassed to report their income honestly. Data is also missing from 2011, 2012, and 2015 when the survey was not conducted, the missing data could have significant impacts on results like the mean wage income for different majors. 
+Another weakness is that wage income and industry of employment are self reported by students who participated in the UC Undergraduate Experience Survey, this means that non response error could affect the results of the analysis. Former students who answered the survey can be systematically different from those who did not in a variety of ways. For instance, students who make significantly less than average may feel embarrassed to report their income honestly. The survey results rely purely on students' honesty, so most errors are impossible to determine. Data is also missing from 2011, 2012, and 2015 when the survey was not conducted, the missing data could have significant impacts on results like the mean wage income for different majors.
 
-The findings of the analysis could be corroborated by similar analysis conducted for different universities in the US to see if the results can be applicable for selective and prestigious universities as well as community colleges. 
+Confounding variables could also play a role in increased income. For example, engineering programs are usually more selective than arts and sciences which leads them to admit students with higher grades. In this case, high grades could the root cause of higher income, and the engineering major happens to have more students with high grades due to the admissions process. Analysis using more variables like gender, race, GPA, parent's income, etc. may reveal additional trends that have a larger impact on income than major. 
+
+The findings of the analysis could be corroborated by similar analysis conducted for different universities in the US to see if the results can be applicable for selective and prestigious universities as well as community colleges. Additional analysis with larger data sets on a regional, country, or even global level could be used to generalize the findings for a larger population.
 
 # Conclusion
+In conclusion, applied science majors have the highest returns on their major. In second are business majors, then arts, and finally science majors. Arts and science majors have negative returns compared to the average bachelor's degree holder so choosing a major at random makes you better off than majoring in arts or sciences. Compared to average income of individuals who do not have a bachelor's degree, all majors have a positive return. So majoring in any of the four majors will make you better off than having no degree, but choosing to major in applied science will make you the best off, followed by business, arts, and sciences.
+
+Our findings suggest that the choice of major has a similarly large affect on income as the choice to attend post-secondary education. For lawmakers who want to influence the long-term outcomes of the labour market, choice of major could be an important pivot point where they can influence students' eventual industry of employment to ensure that the labour force is balanced and there are no shortages of workers in any industry. Companies from different industries can also use preference outcomes to make talent acquisition more targeted, increasing the chances of securing candidates with the skills they require. Finally, students themselves can make better decisions when choosing a major based on their financial needs and goals.
 
 \newpage
 \appendix
 
 # Appendix {-}
-# Additional Figures and Tables
+# Additional Figures, Tables, and Calculations
 ```{r, fig.width = 10, fig.height = 3}
 #| echo: false
 #| eval: true
@@ -467,6 +477,27 @@ summary_more_industries <- tab_footnote(summary_more_industries, "Note: With ana
 
 cols_width(summary_more_industries, everything() ~ pct(14))
 ```
+
+$$
+\begin{aligned}
+Percent\ Difference
+\\
+Applied\ Science\ and\ Business&: (59636-55104)/55104\approx8.2\%
+\\
+Applied\ Science\ and\ Arts&: (59636-45699)/45699\approx30.5\%
+\\
+Applied\ Science\ and\ Sciences&: (59636-45427)/45427\approx31.3\%
+\\
+Business\ and\ Arts&: (55104-45699)/45699\approx20.6\%
+\\
+Business\ and\ Science&: (55104-45427)/45427\approx21.3\%
+\\
+Arts\ and\ Science&: (45699-45427)/45427\approx0.6\%
+\end{aligned}
+$$
+
+An applied science major can expect to earn 8.2% more than a business major, 30.5% more than an arts major, and 31.3% more than a sciences major. And a business major can expect to earn 20.6% more than an arts major and 21.3% more than a sciences major.
+
 
 \newpage
 # References
